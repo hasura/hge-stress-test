@@ -1,0 +1,731 @@
+mutation DeleteById {
+  delete_indv_email(where: { indv_id: { _eq: "37181168" } }) {
+    affected_rows
+  }
+  delete_indv_adr(where: { indv_id: { _eq: "37181168" } }) {
+    affected_rows
+  }
+  delete_indv_key(where: { indv_id: { _eq: "37181168" } }) {
+    affected_rows
+  }
+  delete_tel(where: { indv_id: { _eq: "37181168" } }) {
+    affected_rows
+  }
+  delete_indv_doc(where: { indv_id: { _eq: "37181168" } }) {
+    affected_rows
+  }
+  delete_indv(where: { indv_id: { _eq: "37181168" } }) {
+    affected_rows
+  }
+  insert_indv(
+    objects: [
+      {
+        indv_id: 37181168
+        creat_user_id: "SYSTEM"
+        chg_user_id: "SYSTEM"
+        creat_sys_ref_id: 2204
+        chg_sys_ref_id: 2204
+        updt_ver_nbr: 0
+        fst_nm: "Karen"
+        lst_nm: "Corns"
+        midl_nm: "R"
+        pref_nm: "Preferred"
+        bth_dt: ""
+        lst_4_ssn_nbr: ""
+        gdr_ref_id: 2108
+        vip_ind: 0
+        data_secur_rule_list: ""
+        indv_docs: {
+          data: [
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              data_secur_rule_list: ""
+              indv_doc: $indvDoc
+            }
+          ]
+        }
+        indv_adrs: {
+          data: [
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              adr_ln_1_txt: "23557 W McClintock Rd"
+              cty_nm: "Channahon"
+              cnty_nm: "Will"
+              st_ref_id: 1079
+              adr_typ_ref_id: 2118
+              cntry_ref_id: 845
+              zip_cd_txt: "60410"
+              zip_sufx_cd_txt: "3055"
+              strt_dt: "2018-02-26"
+              mail_ind: 0
+              lat_deg: 41.46857
+              lng_deg: -88.18657
+              updt_ver_nbr: 0
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              adr_ln_1_txt: "23557 W McClintock Rd"
+              cty_nm: "Channahon"
+              cnty_nm: "Will"
+              st_ref_id: 1079
+              adr_typ_ref_id: 2121
+              cntry_ref_id: 845
+              zip_cd_txt: "60410"
+              zip_sufx_cd_txt: "3055"
+              strt_dt: "2020-03-29"
+              mail_ind: 0
+              lat_deg: 41.46857
+              lng_deg: -88.18657
+              updt_ver_nbr: 0
+              data_secur_rule_list: ""
+            }
+          ]
+        }
+        indv_emails: {
+          data: [
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              email_typ_ref_id: 2188
+              email_adr_txt: "KRCONTILLI@AOL.COM"
+              inac_ind: 1
+              updt_ver_nbr: 0
+              data_secur_rule_list: ""
+            }
+          ]
+        }
+        indv_langs: { data: [] }
+        indv_tels: {
+          data: [
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              tel_nbr: "224-875-0799"
+              tel_typ_ref_id: 2159
+              tel_intntl_ind: 0
+              pref_ind: 0
+              txt_msg_ind_ref_id: 0
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              tel_nbr: "224-875-0799"
+              tel_typ_ref_id: 2169
+              tel_intntl_ind: 0
+              pref_ind: 0
+              txt_msg_ind_ref_id: 0
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              tel_nbr: "224-875-0799"
+              tel_typ_ref_id: 2177
+              tel_intntl_ind: 0
+              pref_ind: 0
+              txt_msg_ind_ref_id: 0
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              tel_nbr: "224-875-0799"
+              tel_typ_ref_id: 2162
+              tel_intntl_ind: 0
+              pref_ind: 0
+              txt_msg_ind_ref_id: 0
+              data_secur_rule_list: ""
+            }
+          ]
+        }
+        indv_keys: {
+          data: [
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              orig_sys_cd: "IMDM"
+              indv_key_val: "23537181168"
+              indv_key_typ_ref_id: 2532
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 1048
+              indv_key_val: "235860255678"
+              orig_sys_cd: "CDB_CA"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 922
+              indv_key_val: "235000000016315998"
+              orig_sys_cd: "CDB_CA"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 879
+              indv_key_val: "235386080307"
+              orig_sys_cd: "CDB_CA"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 879
+              indv_key_val: "235243632302"
+              orig_sys_cd: "CDB_CS"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 879
+              indv_key_val: "235297131500"
+              orig_sys_cd: "CDB_CS"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 879
+              indv_key_val: "235243649280"
+              orig_sys_cd: "CDB_PR"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 879
+              indv_key_val: "235589450863"
+              orig_sys_cd: "CDB_AA"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 879
+              indv_key_val: "235367337835"
+              orig_sys_cd: "CDB_CS"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 867
+              indv_key_val: "235976915627"
+              orig_sys_cd: "CDB_CS"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 867
+              indv_key_val: "235827574917"
+              orig_sys_cd: "CDB_CS"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 867
+              indv_key_val: "235860255678"
+              orig_sys_cd: "CDB_CS"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 881
+              indv_key_val: "2358200259816182"
+              orig_sys_cd: "CDB_AA"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 923
+              indv_key_val: "23533975603211"
+              orig_sys_cd: "CDB_AA"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 882
+              indv_key_val: "235146163694"
+              orig_sys_cd: "CDB_CS"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 910
+              indv_key_val: "235343446075A"
+              orig_sys_cd: "CDB_CS"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 1047
+              indv_key_val: "2355422538"
+              orig_sys_cd: "ICUE"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 1047
+              indv_key_val: "23545738308"
+              orig_sys_cd: "ICUE"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 920
+              indv_key_val: "2352KX3FJ1CA17"
+              orig_sys_cd: "RXCC"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 1046
+              indv_key_val: "2354814370"
+              orig_sys_cd: "CIS"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 873
+              indv_key_val: "235976915627"
+              orig_sys_cd: "CDB_PR"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 930
+              indv_key_val: "23515639728301"
+              orig_sys_cd: "RXCC"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 973
+              indv_key_val: "235343446075"
+              orig_sys_cd: "CDB_CS"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 1029
+              indv_key_val: "235254880744"
+              orig_sys_cd: "UID"
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 2757
+              indv_key_val: "23516315998       16315998"
+              orig_sys_cd: "CDB_CA"
+              data_secur_rule_list: ""
+              data_qlty_iss_list: "{}"
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 2757
+              indv_key_val: "23517378890034344607500001"
+              orig_sys_cd: "CDB_CS"
+              data_secur_rule_list: ""
+              data_qlty_iss_list: "{}"
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 2757
+              indv_key_val: "23507173280034344607500001"
+              orig_sys_cd: "CDB_CS"
+              data_secur_rule_list: ""
+              data_qlty_iss_list: "{}"
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 2757
+              indv_key_val: "235073788934344607500"
+              orig_sys_cd: "CDB_PR"
+              data_secur_rule_list: ""
+              data_qlty_iss_list: "{}"
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 2757
+              indv_key_val: "2355422538"
+              orig_sys_cd: "ICUE"
+              data_secur_rule_list: ""
+              data_qlty_iss_list: "{}"
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 2757
+              indv_key_val: "23545738308"
+              orig_sys_cd: "ICUE"
+              data_secur_rule_list: ""
+              data_qlty_iss_list: "{}"
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 2757
+              indv_key_val: "23500286000034344607500001"
+              orig_sys_cd: "CDB_CS"
+              data_secur_rule_list: ""
+              data_qlty_iss_list: "{}"
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 2757
+              indv_key_val: "235254880744-3249"
+              orig_sys_cd: "UID"
+              data_secur_rule_list: ""
+              data_qlty_iss_list: "{}"
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 2757
+              indv_key_val: "235HSPRINGS561726215639728301560"
+              orig_sys_cd: "RXCC"
+              data_secur_rule_list: ""
+              data_qlty_iss_list: "{}"
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_typ_ref_id: 2757
+              indv_key_val: "2358200259816182"
+              orig_sys_cd: "CDB_AA"
+              data_secur_rule_list: ""
+              data_qlty_iss_list: "{}"
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_val: "23500343446075"
+              orig_sys_cd: "CDB_CS"
+              imdm_surrg_key: "1113576998"
+              indv_key_typ_ref_id: 968
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_val: "235001"
+              orig_sys_cd: "CDB_CS"
+              imdm_surrg_key: "1113576998"
+              indv_key_typ_ref_id: 894
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_val: "2350737889"
+              orig_sys_cd: "CDB_CS"
+              imdm_surrg_key: "1113576998"
+              indv_key_typ_ref_id: 955
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_val: "2350717328"
+              orig_sys_cd: "CDB_CS"
+              imdm_surrg_key: "1110853382"
+              indv_key_typ_ref_id: 955
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_val: "235343446075"
+              orig_sys_cd: "CDB_PR"
+              imdm_surrg_key: "1106337358"
+              indv_key_typ_ref_id: 968
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_val: "23500"
+              orig_sys_cd: "CDB_PR"
+              imdm_surrg_key: "1106337358"
+              indv_key_typ_ref_id: 894
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_val: "2350737889"
+              orig_sys_cd: "CDB_PR"
+              imdm_surrg_key: "1106337358"
+              indv_key_typ_ref_id: 955
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_val: "23500343446075"
+              orig_sys_cd: "ICUE"
+              imdm_surrg_key: "790803684"
+              indv_key_typ_ref_id: 968
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_val: "23515639728301"
+              orig_sys_cd: "RXCC"
+              imdm_surrg_key: "627157129"
+              indv_key_typ_ref_id: 921
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_val: "235S5617"
+              orig_sys_cd: "RXCC"
+              imdm_surrg_key: "627157129"
+              indv_key_typ_ref_id: 864
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_val: "235HSPRING"
+              orig_sys_cd: "RXCC"
+              imdm_surrg_key: "627157129"
+              indv_key_typ_ref_id: 887
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_val: "23501"
+              orig_sys_cd: "RXCC"
+              imdm_surrg_key: "627157129"
+              indv_key_typ_ref_id: 894
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_val: "23515639728301"
+              orig_sys_cd: "RXCC"
+              imdm_surrg_key: "627157129"
+              indv_key_typ_ref_id: 901
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_val: "235262"
+              orig_sys_cd: "RXCC"
+              imdm_surrg_key: "627157129"
+              indv_key_typ_ref_id: 907
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_val: "235339756032"
+              orig_sys_cd: "CDB_AA"
+              imdm_surrg_key: "432390364"
+              indv_key_typ_ref_id: 968
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_val: "23536000"
+              orig_sys_cd: "CDB_AA"
+              imdm_surrg_key: "432390364"
+              indv_key_typ_ref_id: 955
+              data_secur_rule_list: ""
+            }
+            {
+              creat_user_id: "SYSTEM"
+              chg_user_id: "SYSTEM"
+              creat_sys_ref_id: 2204
+              chg_sys_ref_id: 2204
+              updt_ver_nbr: 0
+              indv_key_val: "2350189416"
+              orig_sys_cd: "CDB_CS"
+              imdm_surrg_key: "41346262"
+              indv_key_typ_ref_id: 955
+              data_secur_rule_list: ""
+            }
+          ]
+        }
+      }
+    ]
+  ) {
+    affected_rows
+  }
+}
