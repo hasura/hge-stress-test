@@ -132,7 +132,7 @@ class StressTest(object):
     def visualise(self):
         figure, mem_ax = plt.subplots()
         figure.suptitle(
-            f"{self.burst_size}(+{self.burst_size_incr}) evts + "
+            f"{self.burst_size}(+{self.burst_size_incr}) reqs + "
           + f"{self.burst_interval}s > "
           + f"{self.burst_count_min}(+{self.burst_count_incr}) bursts + "
           + f"{self.inter_burst_interval}s > "
@@ -219,10 +219,10 @@ if __name__ == "__main__":
         hge_pid=hge_pid,
         burst_count_min=3,
         burst_count_incr=2,
-        burst_size_min=10,
+        burst_size_min=20,
         burst_size_incr=10,
         burst_interval=0.1,
-        inter_burst_interval=5,
+        inter_burst_interval=6,
         restart_delay=30,
         loop_count=4,
         memory_measurement_interval=0.5,
