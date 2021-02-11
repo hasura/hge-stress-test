@@ -9,10 +9,11 @@ test workloads are of the following form:
 * we run `loop_count` _loops_
   * each loop consists of `bursts_per_loop` _bursts_
     * each burst consists of `requests_per_burst` _requests_
-    * after each request, we wait for `request_delay` seconds
+      * after each request, we wait for `request_delay` seconds
     * once all requests are sent, the burst is complete
     * if `wait_for_bursts_to_complete`, we wait for graphql-engine to respond to all requests made as part of the burst here
     * then we wait for `burst_delay` seconds
+* then we wait for all bursts to complete, so all requests made as part of the loop have been responded to by graphql-engine
 * then we wait for `loop_delay` before starting a new loop
 
 `requests_per_burst` and `bursts_per_loop` are configured in a way that lets them linearly ramp up (or down) over time to simulate increasingly heavy workloads, with `_min` and `_incr` options in the config file. Setting the `_incr` option to zero allows for workloads of constant intensity.
@@ -22,8 +23,8 @@ test workloads are of the following form:
 ![img](img/6-20000-7-500.png)
 
 * the red bars correspond to the period in which a burst is being sent
-* each grey marker is a response received from hge
-* each green line corresponds to a burst which has been _fully_ serviced by hge.
+* each grey marker is a response received from graphql-engine
+* each green line corresponds to a burst which has been _fully_ serviced by graphql-engine
 
 ## workload quality
 
