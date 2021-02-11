@@ -53,7 +53,7 @@ class StressTest(object):
         self.ekg_q = self.manager.list()
         self.burst_service_time_q = self.manager.list()
         self.query_service_time_q = self.manager.list()
-        self.idle_mem_q = self.manager.list()
+        self.mem_instant_q = self.manager.list()
 
         self.hge_pid = hge_pid
         self.bursts_per_loop = bursts_per_loop_min[0]
@@ -70,6 +70,9 @@ class StressTest(object):
         self.wait_for_bursts_to_complete = wait_for_bursts_to_complete
         self.payload_path = payload_path
         self.constant_burst_gap = constant_burst_gap
+
+    def measure_rss(self):
+        self.mem_instant_q.append(mk_event("mem_rss_idle", data=self.get_hge_rss()))
 
     def run_query(self):
         t = time.time()
@@ -131,6 +134,7 @@ class StressTest(object):
             if self.wait_for_bursts_to_complete:
                 p.join()
         self.q.append(mk_event("loop_end"))
+        # self.measure_rss()
         if not self.wait_for_bursts_to_complete:
             for p in procs:
                 p.join()
@@ -144,16 +148,21 @@ class StressTest(object):
             self.run_loop()
             print("waiting before running loop")
             self.bursts_per_loop += self.bursts_per_loop_incr
+            self.measure_rss()
             time.sleep(self.loop_delay)
+            self.measure_rss()
+    
+    def get_hge_rss(self):
+        hge = psutil.Process(pid=self.hge_pid)
+        return hge.memory_info().rss
 
     def run(self):
-        hge = psutil.Process(pid=self.hge_pid)
         p = mp.Process(target=self.run_test)
         p.start()
 
         while True:
             # TODO account for delay in measurement itself
-            self.mem_q.append(mk_event("mem_rss", data=hge.memory_info().rss))
+            self.mem_q.append(mk_event("mem_rss", data=self.get_hge_rss()))
             ekg = requests.get("http://localhost:9080/dev/ekg").json()
             self.ekg_q.append(mk_event("ekg", data=ekg))
             time.sleep(self.measurement_delay)
@@ -215,16 +224,19 @@ class StressTest(object):
                     ekg_current_bytes_used_x, ekg_current_bytes_used_y
                 )
 
+            while self.mem_instant_q:
+                evt = self.mem_instant_q.pop(0)
+                label = f"{humanize.naturalsize(evt.data)}"
+                plt.text(evt.ts, evt.data, label, horizontalalignment='left', 
+                        bbox={'facecolor': '#cccccc', 'linewidth': 0, 'alpha': 0.9})
+
             while self.q:
                 evt = self.q.pop(0)
                 if evt.typ == "burst_fin":
                     plt.axvline(
-                        x=evt.ts, label=f"{evt.typ}", linewidth=2, color="#7bd487",
+                        x=evt.ts, label=f"{evt.typ}", linewidth=1, color="#7bd487",
                         zorder=-1
                     )
-                elif evt.typ == "query_start":
-                    # plt.axvline(x=evt.ts, label=f"{evt.typ}", color="#eeeeee")
-                    pass
                 elif evt.typ == "query_fin":
                     plt.axvline(
                         x=evt.ts,
@@ -264,7 +276,7 @@ class StressTest(object):
         ani = anim.FuncAnimation(figure, update, interval=500)
         p = mp.Process(target=self.run)
         p.start()
-        plt.legend(loc="lower left")
+        plt.legend(loc="upper left")
         plt.grid(True)
         plt.show()
         p.join()
