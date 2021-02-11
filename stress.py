@@ -64,6 +64,9 @@ class StressTest(object):
         self.wait_for_bursts_to_complete = wait_for_bursts_to_complete
         self.payload_path = payload_path
 
+        self.burst_start = None
+        self.burst_end = None
+
     def run_query(self):
         t = time.time()
         self.q.append(mk_event("query_start"))
@@ -92,6 +95,7 @@ class StressTest(object):
             f"burst size: {self.requests_per_burst}, burst count: {self.bursts_per_loop}"
         )
         t = time.time()
+        self.burst_start = datetime.datetime.now()
         self.q.append(mk_event("burst_start"))
         procs = []
         for i in range(self.requests_per_burst):
