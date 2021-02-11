@@ -13,8 +13,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.animation as anim
 import numpy as np
-
-# evt_loop = asyncio.get_event_loop()
+import toml
 
 Event = collections.namedtuple("Event", "ts typ data")
 
@@ -38,7 +37,16 @@ class StressTest(object):
         restart_delay,
         loop_count,
         memory_measurement_interval,
+        wait_for_bursts_to_complete,
+        payload_path,
     ):
+        self.manager = mp.Manager()
+        self.q = self.manager.list()
+        self.mem_q = self.manager.list()
+        self.pending_query_count = mp.Value("i")
+        self.burst_service_time_q = self.manager.list()
+        self.query_service_time_q = self.manager.list()
+
         self.hge_pid = hge_pid
         self.burst_count = burst_count_min
         self.burst_count_min = burst_count_min
@@ -49,24 +57,24 @@ class StressTest(object):
         self.burst_interval = burst_interval
         self.inter_burst_interval = inter_burst_interval
         self.restart_delay = restart_delay
-        self.manager = mp.Manager()
-        self.q = self.manager.list()
-        self.mem_q = self.manager.list()
-        self.pending_query_count = mp.Value('i')
         self.loop_count = loop_count
-        self.burst_service_time_q = self.manager.list()
-        self.query_service_time_q = self.manager.list()
         self.memory_measurement_interval = memory_measurement_interval
+        self.wait_for_bursts_to_complete = wait_for_bursts_to_complete
+        self.payload_path = payload_path
 
     def run_query(self):
         t = time.time()
         self.q.append(mk_event("query_start"))
         with self.pending_query_count.get_lock():
             self.pending_query_count.value += 1
+
         def run_script():
             subprocess.run(
-                "./run_query.sh", stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL
+                ["./run_query.sh", self.payload_path],
+                stderr=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
             )
+
         p = mp.Process(target=run_script)
         p.start()
         p.join()
@@ -104,9 +112,12 @@ class StressTest(object):
             p.start()
             self.burst_size += self.burst_size_incr
             time.sleep(self.inter_burst_interval)
+            if self.wait_for_bursts_to_complete:
+                p.join()
         self.q.append(mk_event("loop_end"))
-        for p in procs:
-            p.join()
+        if not self.wait_for_bursts_to_complete:
+            for p in procs:
+                p.join()
         self.q.append(mk_event("loop_fin"))
 
     def run_test(self):
@@ -133,10 +144,11 @@ class StressTest(object):
         figure, mem_ax = plt.subplots()
         figure.suptitle(
             f"{self.burst_size}(+{self.burst_size_incr}) reqs + "
-          + f"{self.burst_interval}s > "
-          + f"{self.burst_count_min}(+{self.burst_count_incr}) bursts + "
-          + f"{self.inter_burst_interval}s > "
-          + f"{self.loop_count} loops + {self.restart_delay}s")
+            + f"{self.burst_interval}s > "
+            + f"{self.burst_count_min}(+{self.burst_count_incr}) bursts + "
+            + f"{self.inter_burst_interval}s > "
+            + f"{self.loop_count} loops + {self.restart_delay}s"
+        )
         # time_ax = mem_ax.twinx()
 
         mem_ax.yaxis.set_major_formatter(mpl.ticker.FuncFormatter(humanize.naturalsize))
@@ -148,7 +160,9 @@ class StressTest(object):
 
         marker_x_data, marker_labels = [], []
 
-        mem_plt, = mem_ax.plot_date(mem_x_data, mem_y_data, '-', label="mem_rss", color="black")
+        (mem_plt,) = mem_ax.plot_date(
+            mem_x_data, mem_y_data, "-", label="mem_rss", color="black"
+        )
         self.burst_start = 0
         # burst_time_plt, = mem_ax.plot_date(burst_time_x_data, burst_time_y_data, '-', label="burst time")
         # query_time_plt, = mem_ax.plot_date(query_time_x_data, query_time_y_data, '-', label="query time")
@@ -172,12 +186,21 @@ class StressTest(object):
                         plt.axvspan(self.burst_start, evt.ts, color="#ffc4c8")
                         self.burst_start = None
                     elif evt.typ == "burst_fin":
-                        plt.axvline(x=evt.ts, label=f"{evt.typ}", linewidth=3, color="#7bd487")
+                        plt.axvline(
+                            x=evt.ts, label=f"{evt.typ}", linewidth=3, color="#7bd487"
+                        )
                     elif evt.typ == "query_start":
                         # plt.axvline(x=evt.ts, label=f"{evt.typ}", color="#eeeeee")
                         pass
                     elif evt.typ == "query_fin":
-                        plt.axvline(x=evt.ts, ymin=0.8, ymax=0.9, linewidth=3, label=f"{evt.typ}", color="#cccccc")
+                        plt.axvline(
+                            x=evt.ts,
+                            ymin=0.8,
+                            ymax=0.9,
+                            linewidth=3,
+                            label=f"{evt.typ}",
+                            color="#cccccc",
+                        )
 
             # if not len(self.query_service_time_q) == 0:
             #     evt = self.query_service_time_q.pop(0)
@@ -201,10 +224,12 @@ class StressTest(object):
         p.start()
         plt.show()
         p.join()
-        
+
 
 if __name__ == "__main__":
-    hge_pid = int(sys.argv[1])
+    hge_pid = int(sys.argv[2])
+    config = toml.load(sys.argv[1])["stress"]
+    print(config)
     # stress_test = StressTest(
     #     hge_pid=hge_pid,
     #     burst_count=7,
@@ -217,14 +242,6 @@ if __name__ == "__main__":
     # )
     stress_test = StressTest(
         hge_pid=hge_pid,
-        burst_count_min=3,
-        burst_count_incr=2,
-        burst_size_min=20,
-        burst_size_incr=10,
-        burst_interval=0.1,
-        inter_burst_interval=6,
-        restart_delay=30,
-        loop_count=4,
-        memory_measurement_interval=0.5,
+        **config,
     )
     stress_test.visualise()

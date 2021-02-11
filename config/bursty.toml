@@ -1,0 +1,12 @@
+[stress]
+burst_count_min=3
+burst_count_incr=2
+burst_size_min=20
+burst_size_incr=10
+burst_interval=0.1
+inter_burst_interval=6
+restart_delay=30
+loop_count=4
+memory_measurement_interval=0.5
+wait_for_bursts_to_complete=true
+payload_path="payload/light.graphql"
