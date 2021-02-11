@@ -28,15 +28,15 @@ class StressTest(object):
     def __init__(
         self,
         hge_pid,
-        burst_count_min,
-        burst_count_incr,
-        burst_size_min,
-        burst_size_incr,
-        burst_interval,
-        inter_burst_interval,
-        restart_delay,
+        bursts_per_loop_min,
+        bursts_per_loop_incr,
+        requests_per_burst_min,
+        requests_per_burst_incr,
+        request_delay,
+        burst_delay,
+        loop_delay,
         loop_count,
-        memory_measurement_interval,
+        memory_measurement_delay,
         wait_for_bursts_to_complete,
         payload_path,
     ):
@@ -48,17 +48,17 @@ class StressTest(object):
         self.query_service_time_q = self.manager.list()
 
         self.hge_pid = hge_pid
-        self.burst_count = burst_count_min
-        self.burst_count_min = burst_count_min
-        self.burst_count_incr = burst_count_incr
-        self.burst_size = burst_size_min
-        self.burst_size_min = burst_size_min
-        self.burst_size_incr = burst_size_incr
-        self.burst_interval = burst_interval
-        self.inter_burst_interval = inter_burst_interval
-        self.restart_delay = restart_delay
+        self.bursts_per_loop = bursts_per_loop_min
+        self.bursts_per_loop_min = bursts_per_loop_min
+        self.bursts_per_loop_incr = bursts_per_loop_incr
+        self.requests_per_burst = requests_per_burst_min
+        self.requests_per_burst_min = requests_per_burst_min
+        self.requests_per_burst_incr = requests_per_burst_incr
+        self.request_delay = request_delay
+        self.burst_delay = burst_delay
+        self.loop_delay = loop_delay
         self.loop_count = loop_count
-        self.memory_measurement_interval = memory_measurement_interval
+        self.memory_measurement_delay = memory_measurement_delay
         self.wait_for_bursts_to_complete = wait_for_bursts_to_complete
         self.payload_path = payload_path
 
@@ -86,15 +86,15 @@ class StressTest(object):
         self.query_service_time_q.append(evt)
 
     def run_burst(self):
-        print(f"burst size: {self.burst_size}, burst count: {self.burst_count}")
+        print(f"burst size: {self.requests_per_burst}, burst count: {self.bursts_per_loop}")
         t = time.time()
         self.q.append(mk_event("burst_start"))
         procs = []
-        for i in range(self.burst_size):
+        for i in range(self.requests_per_burst):
             p = mp.Process(target=self.run_query)
             procs.append(p)
             p.start()
-            time.sleep(self.burst_interval)
+            time.sleep(self.request_delay)
         self.q.append(mk_event("burst_end"))
         for p in procs:
             p.join()
@@ -106,12 +106,12 @@ class StressTest(object):
         print("running loop")
         self.q.append(mk_event("loop_start"))
         procs = []
-        for i in range(self.burst_count):
+        for i in range(self.bursts_per_loop):
             p = mp.Process(target=self.run_burst)
             procs.append(p)
             p.start()
-            self.burst_size += self.burst_size_incr
-            time.sleep(self.inter_burst_interval)
+            self.requests_per_burst += self.requests_per_burst_incr
+            time.sleep(self.burst_delay)
             if self.wait_for_bursts_to_complete:
                 p.join()
         self.q.append(mk_event("loop_end"))
@@ -125,9 +125,9 @@ class StressTest(object):
             print("running loop")
             self.run_loop()
             print("waiting before running loop")
-            self.burst_size = self.burst_size_min
-            self.burst_count += self.burst_count_incr
-            time.sleep(self.restart_delay)
+            self.requests_per_burst = self.requests_per_burst_min
+            self.bursts_per_loop += self.bursts_per_loop_incr
+            time.sleep(self.loop_delay)
 
     def run(self):
         hge = psutil.Process(pid=self.hge_pid)
@@ -136,18 +136,18 @@ class StressTest(object):
 
         while True:
             self.mem_q.append(mk_event("mem_rss", data=hge.memory_info().rss))
-            time.sleep(self.memory_measurement_interval)
+            time.sleep(self.memory_measurement_delay)
 
         p.join()
 
     def visualise(self):
         figure, mem_ax = plt.subplots()
         figure.suptitle(
-            f"{self.burst_size}(+{self.burst_size_incr}) reqs + "
-            + f"{self.burst_interval}s > "
-            + f"{self.burst_count_min}(+{self.burst_count_incr}) bursts + "
-            + f"{self.inter_burst_interval}s > "
-            + f"{self.loop_count} loops + {self.restart_delay}s"
+            f"{self.requests_per_burst}(+{self.requests_per_burst_incr}) reqs + "
+            + f"{self.request_delay}s > "
+            + f"{self.bursts_per_loop_min}(+{self.bursts_per_loop_incr}) bursts + "
+            + f"{self.burst_delay}s > "
+            + f"{self.loop_count} loops + {self.loop_delay}s"
         )
         # time_ax = mem_ax.twinx()
 
@@ -232,13 +232,13 @@ if __name__ == "__main__":
     print(config)
     # stress_test = StressTest(
     #     hge_pid=hge_pid,
-    #     burst_count=7,
-    #     burst_size=8,
-    #     burst_interval=0.5,
-    #     inter_burst_interval=20,
-    #     restart_delay=30,
+    #     bursts_per_loop=7,
+    #     requests_per_burst=8,
+    #     request_delay=0.5,
+    #     burst_delay=20,
+    #     loop_delay=30,
     #     loop_count=4,
-    #     memory_measurement_interval=0.5,
+    #     memory_measurement_delay=0.5,
     # )
     stress_test = StressTest(
         hge_pid=hge_pid,
