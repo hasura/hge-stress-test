@@ -19,6 +19,7 @@ import requests
 Event = collections.namedtuple("Event", "ts typ data")
 Pair = collections.namedtuple("Pair", "x y")
 
+
 def mk_event(t, data=None):
     e = Event(datetime.datetime.now(), t, data)
     # print(e)
@@ -52,12 +53,13 @@ class StressTest(object):
         self.ekg_q = self.manager.list()
         self.burst_service_time_q = self.manager.list()
         self.query_service_time_q = self.manager.list()
+        self.idle_mem_q = self.manager.list()
 
         self.hge_pid = hge_pid
-        self.bursts_per_loop = bursts_per_loop_min
+        self.bursts_per_loop = bursts_per_loop_min[0]
         self.bursts_per_loop_min = bursts_per_loop_min
         self.bursts_per_loop_incr = bursts_per_loop_incr
-        self.requests_per_burst = requests_per_burst_min
+        self.requests_per_burst = requests_per_burst_min[0]
         self.requests_per_burst_min = requests_per_burst_min
         self.requests_per_burst_incr = requests_per_burst_incr
         self.request_delay = request_delay
@@ -67,6 +69,7 @@ class StressTest(object):
         self.measurement_delay = measurement_delay
         self.wait_for_bursts_to_complete = wait_for_bursts_to_complete
         self.payload_path = payload_path
+        self.constant_burst_gap = constant_burst_gap
 
     def run_query(self):
         t = time.time()
@@ -92,9 +95,7 @@ class StressTest(object):
         self.query_service_time_q.append(evt)
 
     def run_burst(self):
-        print(
-            f"burst size: {self.requests_per_burst}, burst count: {self.bursts_per_loop}"
-        )
+        print(f"r/b: {self.requests_per_burst}, b/l: {self.bursts_per_loop}")
         t = time.time()
         burst_start = datetime.datetime.now()
         self.q.append(mk_event("burst_start"))
@@ -138,9 +139,10 @@ class StressTest(object):
     def run_test(self):
         for i in range(self.loop_count):
             print("running loop")
+            self.requests_per_burst = self.requests_per_burst_min[i]
+            self.bursts_per_loop = self.bursts_per_loop_min[i]
             self.run_loop()
             print("waiting before running loop")
-            self.requests_per_burst = self.requests_per_burst_min
             self.bursts_per_loop += self.bursts_per_loop_incr
             time.sleep(self.loop_delay)
 
@@ -161,14 +163,17 @@ class StressTest(object):
     def visualise(self):
         figure, mem_ax = plt.subplots()
         figure.suptitle(
-            f"{self.requests_per_burst}(+{self.requests_per_burst_incr}) reqs + "
+            f"{self.requests_per_burst_min}(+{self.requests_per_burst_incr}) reqs + "
             + f"{self.request_delay}s > "
             + f"{self.bursts_per_loop_min}(+{self.bursts_per_loop_incr}) bursts + "
             + f"{self.burst_delay}s > "
             + f"{self.loop_count} loops + {self.loop_delay}s"
         )
         # time_ax = mem_ax.twinx()
-
+        giga = 10 ** 9
+        mem_ax.set_ylim([0, 24 * giga])
+        mem_ax.yaxis.set_ticks(np.arange(0, 24 * giga, giga))
+        # mem_ax.yaxis.set_minor_locator(mpl.ticker.AutoMinorLocator(5))
         mem_ax.yaxis.set_major_formatter(mpl.ticker.FuncFormatter(humanize.naturalsize))
         # time_ax.set_ylabel("time")
 
@@ -180,10 +185,14 @@ class StressTest(object):
         marker_x_data, marker_labels = [], []
 
         (mem_plt,) = mem_ax.plot_date(
-            mem_data_x, mem_data_y, "-", label="mem_rss", color="black"
+            mem_data_x, mem_data_y, "-", label="mem_rss", color="black", linewidth=1
         )
         (ekg_current_bytes_used_plt,) = mem_ax.plot_date(
-            ekg_current_bytes_used_x, ekg_current_bytes_used_y, "-", label="ekg_current_bytes_used", color="#0a7787"
+            ekg_current_bytes_used_x,
+            ekg_current_bytes_used_y,
+            "-",
+            label="ekg_current_bytes_used",
+            color="#0a7787", linewidth=1
         )
         self.burst_start = 0
         # burst_time_plt, = mem_ax.plot_date(burst_time_x_data, burst_time_y_data, '-', label="burst time")
@@ -199,14 +208,19 @@ class StressTest(object):
             while self.ekg_q:
                 evt = self.ekg_q.pop(0)
                 ekg_current_bytes_used_x.append(evt.ts)
-                ekg_current_bytes_used_y.append(evt.data['rts']['gc']['current_bytes_used']['val'])
-                ekg_current_bytes_used_plt.set_data(ekg_current_bytes_used_x, ekg_current_bytes_used_y)
+                ekg_current_bytes_used_y.append(
+                    evt.data["rts"]["gc"]["current_bytes_used"]["val"]
+                )
+                ekg_current_bytes_used_plt.set_data(
+                    ekg_current_bytes_used_x, ekg_current_bytes_used_y
+                )
 
             while self.q:
                 evt = self.q.pop(0)
                 if evt.typ == "burst_fin":
                     plt.axvline(
-                        x=evt.ts, label=f"{evt.typ}", linewidth=2, color="#7bd487"
+                        x=evt.ts, label=f"{evt.typ}", linewidth=2, color="#7bd487",
+                        zorder=-1
                     )
                 elif evt.typ == "query_start":
                     # plt.axvline(x=evt.ts, label=f"{evt.typ}", color="#eeeeee")
@@ -217,7 +231,7 @@ class StressTest(object):
                         ymin=0.225,
                         ymax=0.275,
                         linewidth=1,
-                        zorder=-1,
+                        zorder=-2,
                         label=f"{evt.typ}",
                         color="#7bd487",
                     )
@@ -227,9 +241,8 @@ class StressTest(object):
                 burst_start = evt[0]
                 burst_end = evt[1]
                 print(f"burst length: {burst_end - burst_start}")
-                plt.axvspan(
-                    burst_start, burst_end, color="#dfdfff", zorder=-2
-                )
+                plt.axvline(burst_end, color="#8f8fff", linewidth=1, zorder=-3)
+                plt.axvspan(burst_start, burst_end, color="#dfdfff", zorder=-3)
 
             # if not len(self.query_service_time_q) == 0:
             #     evt = self.query_service_time_q.pop(0)
@@ -252,6 +265,7 @@ class StressTest(object):
         p = mp.Process(target=self.run)
         p.start()
         plt.legend(loc="lower left")
+        plt.grid(True)
         plt.show()
         p.join()
 
