@@ -38,12 +38,16 @@ class StressTest(object):
         loop_delay,
         loop_count,
         measurement_delay,
-        wait_for_bursts_to_complete,
         payload_path,
+        wait_for_bursts_to_complete=False,
+        constant_burst_gap=True,
     ):
         self.manager = mp.Manager()
-        self.q = self.manager.list()
         self.pending_query_count = mp.Value("i")
+
+        self.q = self.manager.list()
+        self.burst_end_q = mp.Queue()
+        self.burst_span_q = self.manager.list()
         self.mem_q = self.manager.list()
         self.ekg_q = self.manager.list()
         self.burst_service_time_q = self.manager.list()
@@ -63,9 +67,6 @@ class StressTest(object):
         self.measurement_delay = measurement_delay
         self.wait_for_bursts_to_complete = wait_for_bursts_to_complete
         self.payload_path = payload_path
-
-        self.burst_start = None
-        self.burst_end = None
 
     def run_query(self):
         t = time.time()
@@ -95,7 +96,7 @@ class StressTest(object):
             f"burst size: {self.requests_per_burst}, burst count: {self.bursts_per_loop}"
         )
         t = time.time()
-        self.burst_start = datetime.datetime.now()
+        burst_start = datetime.datetime.now()
         self.q.append(mk_event("burst_start"))
         procs = []
         for i in range(self.requests_per_burst):
@@ -103,7 +104,10 @@ class StressTest(object):
             procs.append(p)
             p.start()
             time.sleep(self.request_delay)
+        burst_end = datetime.datetime.now()
         self.q.append(mk_event("burst_end"))
+        self.burst_end_q.put("burst_end")
+        self.burst_span_q.append((burst_start, burst_end))
         for p in procs:
             p.join()
         t = time.time() - t
@@ -119,6 +123,9 @@ class StressTest(object):
             procs.append(p)
             p.start()
             self.requests_per_burst += self.requests_per_burst_incr
+            # wait until the burst ends
+            if self.constant_burst_gap:
+                self.burst_end_q.get()
             time.sleep(self.burst_delay)
             if self.wait_for_bursts_to_complete:
                 p.join()
@@ -183,47 +190,46 @@ class StressTest(object):
         # query_time_plt, = mem_ax.plot_date(query_time_x_data, query_time_y_data, '-', label="query time")
 
         def update(frame):
-            if self.mem_q:
-                while self.mem_q:
-                    evt = self.mem_q.pop(0)
-                    mem_data_x.append(evt.ts)
-                    mem_data_y.append(evt.data)
-                    mem_plt.set_data(mem_data_x, mem_data_y)
+            while self.mem_q:
+                evt = self.mem_q.pop(0)
+                mem_data_x.append(evt.ts)
+                mem_data_y.append(evt.data)
+                mem_plt.set_data(mem_data_x, mem_data_y)
 
-            if self.ekg_q:
-                while self.ekg_q:
-                    evt = self.ekg_q.pop(0)
-                    ekg_current_bytes_used_x.append(evt.ts)
-                    ekg_current_bytes_used_y.append(evt.data['rts']['gc']['current_bytes_used']['val'])
-                    ekg_current_bytes_used_plt.set_data(ekg_current_bytes_used_x, ekg_current_bytes_used_y)
+            while self.ekg_q:
+                evt = self.ekg_q.pop(0)
+                ekg_current_bytes_used_x.append(evt.ts)
+                ekg_current_bytes_used_y.append(evt.data['rts']['gc']['current_bytes_used']['val'])
+                ekg_current_bytes_used_plt.set_data(ekg_current_bytes_used_x, ekg_current_bytes_used_y)
 
-            if self.q:
-                while self.q:
-                    evt = self.q.pop(0)
-                    if evt.typ == "burst_start":
-                        self.burst_start = evt.ts
-                    elif evt.typ == "burst_end":
-                        plt.axvspan(
-                            self.burst_start, evt.ts, color="#dfdfff", zorder=-2
-                        )
-                        self.burst_start = None
-                    elif evt.typ == "burst_fin":
-                        plt.axvline(
-                            x=evt.ts, label=f"{evt.typ}", linewidth=2, color="#7bd487"
-                        )
-                    elif evt.typ == "query_start":
-                        # plt.axvline(x=evt.ts, label=f"{evt.typ}", color="#eeeeee")
-                        pass
-                    elif evt.typ == "query_fin":
-                        plt.axvline(
-                            x=evt.ts,
-                            ymin=0.225,
-                            ymax=0.275,
-                            linewidth=1,
-                            zorder=-1,
-                            label=f"{evt.typ}",
-                            color="#7bd487",
-                        )
+            while self.q:
+                evt = self.q.pop(0)
+                if evt.typ == "burst_fin":
+                    plt.axvline(
+                        x=evt.ts, label=f"{evt.typ}", linewidth=2, color="#7bd487"
+                    )
+                elif evt.typ == "query_start":
+                    # plt.axvline(x=evt.ts, label=f"{evt.typ}", color="#eeeeee")
+                    pass
+                elif evt.typ == "query_fin":
+                    plt.axvline(
+                        x=evt.ts,
+                        ymin=0.225,
+                        ymax=0.275,
+                        linewidth=1,
+                        zorder=-1,
+                        label=f"{evt.typ}",
+                        color="#7bd487",
+                    )
+
+            while self.burst_span_q:
+                evt = self.burst_span_q.pop(0)
+                burst_start = evt[0]
+                burst_end = evt[1]
+                print(f"burst length: {burst_end - burst_start}")
+                plt.axvspan(
+                    burst_start, burst_end, color="#dfdfff", zorder=-2
+                )
 
             # if not len(self.query_service_time_q) == 0:
             #     evt = self.query_service_time_q.pop(0)
