@@ -7,6 +7,6 @@ request_delay=0.5
 burst_delay=0.5
 loop_delay=30
 loop_count=10
-memory_measurement_delay=0.5
+measurement_delay=0.5
 wait_for_bursts_to_complete=true
 payload_path="payload/light.graphql"

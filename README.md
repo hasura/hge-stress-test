@@ -23,10 +23,10 @@ setting the `_incr` option to zero allows for workloads of constant intensity.
 
 ## visualisation format
 
-![img](img/6-20000-7-500.png)
+![img](img/new.png)
 
-* the red bars correspond to the period in which a burst is being sent
-* each grey marker is a response received from graphql-engine
+* the marked regions on the graph correspond to periods in which a burst is being sent
+* each short line marker is a response received from graphql-engine
 * each green line corresponds to a burst which has been _fully_ serviced by graphql-engine
 * the heading is a concise description of the workload parameters: 
 
@@ -38,7 +38,7 @@ setting the `_incr` option to zero allows for workloads of constant intensity.
 
 ## workload quality
 
-bursty workloads can be simulated with fewer, larger bursts and a large burst delay. for sustained load tests, burst delay can be made equal to request delay.
+bursty workloads can be simulated with fewer, larger bursts and a large burst delay. for sustained load tests, burst delay can be set to zero.
 
 to avoid overloading the server with too many pending requests, set `wait_for_bursts_to_complete` to true.
 
