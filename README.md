@@ -4,11 +4,12 @@ this script allows you to configure and run workloads against a running graphql-
 
 ## workload structure
 
-test workloads are of the following form:
+test workloads are of the following form, parameterised by the given options, which are all specified in the config file:
 
 * we run `loop_count` _loops_
   * each loop consists of `bursts_per_loop` _bursts_
     * each burst consists of `requests_per_burst` _requests_
+      * the request is a graphql file located at the path given by `payload`
       * after each request, we wait for `request_delay` seconds
     * once all requests are sent, the burst is complete
     * if `wait_for_bursts_to_complete`, we wait for graphql-engine to respond to all requests made as part of the burst here
