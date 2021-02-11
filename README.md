@@ -23,7 +23,7 @@ setting the `_incr` option to zero allows for workloads of constant intensity.
 
 ## visualisation format
 
-![img](img/new.png)
+![img](img/new2.png)
 
 * the marked regions on the graph correspond to periods in which a burst is being sent
 * each short line marker is a response received from graphql-engine
