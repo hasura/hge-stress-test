@@ -17,7 +17,9 @@ test workloads are of the following form, parameterised by the given options, wh
 * then we wait for all bursts to complete, so all requests made as part of the loop have been responded to by graphql-engine
 * then we wait for `loop_delay` before starting a new loop
 
-`requests_per_burst` and `bursts_per_loop` are configured in a way that lets them linearly ramp up (or down) over time to simulate increasingly heavy workloads, with `_min` and `_incr` options in the config file. Setting the `_incr` option to zero allows for workloads of constant intensity.
+`requests_per_burst` and `bursts_per_loop` are configured in a way that lets them linearly ramp up (or down) over time to simulate increasingly heavy workloads, with `_min` and `_incr` options in the config file. `requests_per_burst` is changed after each burst, and reset at the start of a new loop. `bursts_per_loop` is changed after each loop.
+
+setting the `_incr` option to zero allows for workloads of constant intensity.
 
 ## visualisation format
 
@@ -26,6 +28,13 @@ test workloads are of the following form, parameterised by the given options, wh
 * the red bars correspond to the period in which a burst is being sent
 * each grey marker is a response received from graphql-engine
 * each green line corresponds to a burst which has been _fully_ serviced by graphql-engine
+* the heading is a concise description of the workload parameters: 
+
+```
+  rpb_min(+rpb_incr) reqs + req_delay
+> bpl_min(+bpl_incr) bursts + burst_delay
+> loop_count loops + loop_delay
+```
 
 ## workload quality
 
