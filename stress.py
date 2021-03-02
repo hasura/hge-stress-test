@@ -192,6 +192,7 @@ class StressTest(object):
         # query_time_x_data, query_time_y_data = [], []
         # burst_time_x_data, burst_time_y_data = [], []
         ekg_current_bytes_used_x, ekg_current_bytes_used_y = [], []
+        ekg_mem_in_use_x, ekg_mem_in_use_y = [], []
 
         marker_x_data, marker_labels = [], []
 
@@ -204,6 +205,13 @@ class StressTest(object):
             "-",
             label="ekg_current_bytes_used",
             color="#0a7787", linewidth=1
+        )
+        (ekg_mem_in_use_plt,) = mem_ax.plot_date(
+            ekg_mem_in_use_x,
+            ekg_mem_in_use_y,
+            "-",
+            label="ekg_mem_in_use",
+            color="#1c730d", linewidth=1
         )
         self.burst_start = 0
         # burst_time_plt, = mem_ax.plot_date(burst_time_x_data, burst_time_y_data, '-', label="burst time")
@@ -225,6 +233,13 @@ class StressTest(object):
                     )
                     ekg_current_bytes_used_plt.set_data(
                         ekg_current_bytes_used_x, ekg_current_bytes_used_y
+                    )
+                    ekg_mem_in_use_x.append(evt.ts)
+                    ekg_mem_in_use_y.append(
+                        evt.data["gcdetails_mem_in_use_bytes"]["val"]
+                    )
+                    ekg_mem_in_use_plt.set_data(
+                        ekg_mem_in_use_x, ekg_mem_in_use_y
                     )
 
             while self.mem_instant_q:

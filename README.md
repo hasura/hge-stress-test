@@ -53,23 +53,46 @@ to avoid overloading the server with too many pending requests, set `wait_for_bu
 
 ## setup instructions
 
-`stress.py` expects a `graphql-engine` pid to monitor for memory usage, and a configuration file that defines the parameters for the test.
+`stress.py` expects a `graphql-engine` pid to monitor for memory usage, and a configuration file that defines the parameters for the test. by default, it expects a `graphql-engine` instance on port 9080.
 
 ```
 # install python deps
 $ pip install -r requirements.txt
 
-# set up the postgres db
+# set up a postgres db on port 7432
 $ docker run --rm --name hge2 -e "POSTGRES_PASSWORD=password" -p 7432:5432 -d postgres -c "log_statement=all"
+
+# import the data dump
 $ PGPASSWORD=password psql -h 172.17.0.1 -U postgres -d postgres -p 7432 --single-transaction -f dump.sql
 
-# start hge, e.g. for 1.3.2 (repro version):
+# start hge, e.g. for 1.3.2 (client repro version):
 $ docker run --rm -p 9080:8080 hasura/graphql-engine:v1.3.2 graphql-engine \
   --database-url='postgresql://postgres:password@172.17.0.1:7432/postgres' serve \
   --enable-telemetry false --enable-console --query-plan-cache-size 0 --use-prepared-statements 'false'
 
-# import the metadata in the console
+# or for main:
+$ cabal new-run -- exe:graphql-engine \
+  --database-url='postgres://postgres:password@localhost:7432/postgres' \
+  serve --server-port 9080 --enable-console --console-assets-dir=../console/static/dist \
+--enable-telemetry false --query-plan-cache-size 0 --use-prepared-statements 'false' \
+--enabled-apis "developer,graphql,metadata"
+
+# now import the metadata in the console. you can also do this, at least running from main:
+$ curl -XPOST -d '{"type":"replace_metadata","args":'$(cat metadata.json)'}' "http://localhost:9080/v1/metadata"
 
 # run the tests
 $ ./stress.py config/bursty.toml $(pidof graphql-engine)
+```
+
+single-loop configurations are provided as well, to test varying concurrency manually, using a total of 64 requests:
+
+```
+# 2 bursts, 32 requests each
+$ ./stress.py config/single/2-32.toml $(pidof graphql-engine)
+
+# 4 bursts, 16 requests each
+$ ./stress.py config/single/4-16.toml $(pidof graphql-engine)
+
+# 8 bursts, 8 requests each
+$ ./stress.py config/single/8-8.toml $(pidof graphql-engine)
 ```
