@@ -45,6 +45,7 @@ class StressTest(object):
     ):
         self.manager = mp.Manager()
         self.pending_query_count = mp.Value("i")
+        self.enable_ekg = True
 
         self.q = self.manager.list()
         self.burst_end_q = mp.Queue()
@@ -163,8 +164,9 @@ class StressTest(object):
         while True:
             # TODO account for delay in measurement itself
             self.mem_q.append(mk_event("mem_rss", data=self.get_hge_rss()))
-            ekg = requests.get("http://localhost:9080/dev/ekg").json()
-            self.ekg_q.append(mk_event("ekg", data=ekg))
+            if self.enable_ekg:
+                ekg = requests.get("http://localhost:9080/dev/ekg").json()
+                self.ekg_q.append(mk_event("ekg", data=ekg))
             time.sleep(self.measurement_delay)
 
         p.join()
@@ -214,15 +216,16 @@ class StressTest(object):
                 mem_data_y.append(evt.data)
                 mem_plt.set_data(mem_data_x, mem_data_y)
 
-            while self.ekg_q:
-                evt = self.ekg_q.pop(0)
-                ekg_current_bytes_used_x.append(evt.ts)
-                ekg_current_bytes_used_y.append(
-                    evt.data["rts"]["gc"]["current_bytes_used"]["val"]
-                )
-                ekg_current_bytes_used_plt.set_data(
-                    ekg_current_bytes_used_x, ekg_current_bytes_used_y
-                )
+            if self.enable_ekg:
+                while self.ekg_q:
+                    evt = self.ekg_q.pop(0)
+                    ekg_current_bytes_used_x.append(evt.ts)
+                    ekg_current_bytes_used_y.append(
+                        evt.data["rts"]["gc"]["current_bytes_used"]["val"]
+                    )
+                    ekg_current_bytes_used_plt.set_data(
+                        ekg_current_bytes_used_x, ekg_current_bytes_used_y
+                    )
 
             while self.mem_instant_q:
                 evt = self.mem_instant_q.pop(0)

@@ -1,6 +1,6 @@
 # stress test for the hasura graphql engine
 
-this script allows you to configure and run workloads against a running graphql-engine instance, and produces an animated visualisation of memory usage. both bursty and sustained workloads are possible, and workloads can be configured to get heavier or lighter over time.
+this script allows you to configure and run workloads against a running graphql-engine instance, and produces an animated visualisation of memory usage. both bursty and sustained workloads are possible, and workloads can be configured to get heavier or lighter over time. in addition, it supports running workloads that do (for example) the same amount of "work" but with different amounts of concurrency.
 
 ## workload structure
 
@@ -39,6 +39,15 @@ setting the `_incr` option to zero allows for workloads of constant intensity.
 ## workload quality
 
 bursty workloads can be simulated with fewer, larger bursts and a large burst delay. for sustained load tests, burst delay can be set to zero.
+
+to implement concurrency scaling, one can do, e.g.
+
+```toml
+bursts_per_loop_min = [2, 4, 8, 16]
+requests_per_burst_min = [16, 8, 4, 2]
+```
+
+this will run the same number of requests in each loop, but with decreasing concurrency.
 
 to avoid overloading the server with too many pending requests, set `wait_for_bursts_to_complete` to true.
 

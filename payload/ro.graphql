@@ -1,0 +1,17 @@
+mutation InsertObjects($cities: [cities_insert_input!]!) {
+  j2: insert_cities(objects: $cities on_conflict: {constraint: cities_pkey update_columns: [name_en, name_ru]}) {
+    affected_rows
+  }
+  j3: insert_cities(objects: $cities on_conflict: {constraint: cities_pkey update_columns: [name_en, name_ru]}) {
+    affected_rows
+  }
+  j4: insert_cities(objects: $cities on_conflict: {constraint: cities_pkey update_columns: [name_en, name_ru]}) {
+    affected_rows
+  }
+  j5: insert_cities(objects: $cities on_conflict: {constraint: cities_pkey update_columns: [name_en, name_ru]}) {
+    affected_rows
+  }
+  j6: insert_cities(objects: $cities on_conflict: {constraint: cities_pkey update_columns: [name_en, name_ru]}) {
+    affected_rows
+  }
+}
