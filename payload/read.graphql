@@ -1,0 +1,8 @@
+query QueryObjects {
+  cities {
+    id
+    country {
+      id
+    }
+  }
+}

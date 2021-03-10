@@ -1,8 +1,8 @@
 [stress]
 bursts_per_loop_min = [2,4]
 bursts_per_loop_incr = 0
-requests_per_burst_min = [8,4]
-requests_per_burst_incr = 0
+mutations_per_burst_min = [8,4]
+mutations_per_burst_incr = 0
 request_delay = 0.5
 burst_delay = 2
 loop_delay = 20

@@ -32,16 +32,20 @@ class StressTest(object):
         hge_pid,
         bursts_per_loop_min,
         bursts_per_loop_incr,
-        requests_per_burst_min,
-        requests_per_burst_incr,
+        mutations_per_burst_min,
+        mutations_per_burst_incr,
         request_delay,
         burst_delay,
         loop_delay,
         loop_count,
         measurement_delay,
         payload_path,
+        read_payload_path="payload/read.graphql",
+        read_delay=0.1,
+        use_read_loop=True,
         wait_for_bursts_to_complete=False,
         constant_burst_gap=True,
+        kill_read_delay=90
     ):
         self.manager = mp.Manager()
         self.pending_query_count = mp.Value("i")
@@ -60,9 +64,9 @@ class StressTest(object):
         self.bursts_per_loop = bursts_per_loop_min[0]
         self.bursts_per_loop_min = bursts_per_loop_min
         self.bursts_per_loop_incr = bursts_per_loop_incr
-        self.requests_per_burst = requests_per_burst_min[0]
-        self.requests_per_burst_min = requests_per_burst_min
-        self.requests_per_burst_incr = requests_per_burst_incr
+        self.mutations_per_burst = mutations_per_burst_min[0]
+        self.mutations_per_burst_min = mutations_per_burst_min
+        self.mutations_per_burst_incr = mutations_per_burst_incr
         self.request_delay = request_delay
         self.burst_delay = burst_delay
         self.loop_delay = loop_delay
@@ -70,10 +74,32 @@ class StressTest(object):
         self.measurement_delay = measurement_delay
         self.wait_for_bursts_to_complete = wait_for_bursts_to_complete
         self.payload_path = payload_path
+        self.read_payload_path = read_payload_path
+        self.read_delay = read_delay
         self.constant_burst_gap = constant_burst_gap
+        self.use_read_loop = use_read_loop
+        self.kill_read_delay = kill_read_delay
 
     def measure_rss(self):
         self.mem_instant_q.append(mk_event("mem_rss_idle", data=self.get_hge_rss()))
+
+    def run_read(self):
+        t = time.time()
+        self.q.append(mk_event("read_start"))
+
+        def run_script():
+            subprocess.run(
+                ["./run_read.sh", self.read_payload_path],
+                stderr=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+            )
+
+        p = mp.Process(target=run_script)
+        p.start()
+        p.join()
+        t = time.time() - t
+        evt = mk_event("read_fin", data=t)
+        self.q.append(evt)
 
     def run_query(self):
         t = time.time()
@@ -99,12 +125,12 @@ class StressTest(object):
         self.query_service_time_q.append(evt)
 
     def run_burst(self):
-        print(f"r/b: {self.requests_per_burst}, b/l: {self.bursts_per_loop}")
+        print(f"r/b: {self.mutations_per_burst}, b/l: {self.bursts_per_loop}")
         t = time.time()
         burst_start = datetime.datetime.now()
         self.q.append(mk_event("burst_start"))
         procs = []
-        for i in range(self.requests_per_burst):
+        for i in range(self.mutations_per_burst):
             p = mp.Process(target=self.run_query)
             procs.append(p)
             p.start()
@@ -119,6 +145,22 @@ class StressTest(object):
         self.q.append(mk_event("burst_fin", data=t))
         self.burst_service_time_q.append(mk_event("burst_fin", data=t))
 
+    def run_read_loop(self):
+        print("running read loop")
+        count = 0
+        time_taken = datetime.timedelta()
+        while True:
+            t = datetime.datetime.now()
+            p = mp.Process(target=self.run_read)
+            p.start()
+            time.sleep(self.read_delay)
+            t = datetime.datetime.now() - t
+            time_taken += t
+            count += 1
+            if count % 100 == 0:
+                print(f"{count} reads run in {time_taken} time")
+                time_taken = datetime.timedelta()
+
     def run_loop(self):
         print("running loop")
         self.q.append(mk_event("loop_start"))
@@ -127,7 +169,7 @@ class StressTest(object):
             p = mp.Process(target=self.run_burst)
             procs.append(p)
             p.start()
-            self.requests_per_burst += self.requests_per_burst_incr
+            self.mutations_per_burst += self.mutations_per_burst_incr
             # wait until the burst ends
             if self.constant_burst_gap:
                 self.burst_end_q.get()
@@ -142,9 +184,12 @@ class StressTest(object):
         self.q.append(mk_event("loop_fin"))
 
     def run_test(self):
+        if self.use_read_loop:
+            p = mp.Process(target=self.run_read_loop)
+            p.start()
         for i in range(self.loop_count):
             print("running loop")
-            self.requests_per_burst = self.requests_per_burst_min[i]
+            self.mutations_per_burst = self.mutations_per_burst_min[i]
             self.bursts_per_loop = self.bursts_per_loop_min[i]
             self.run_loop()
             print("waiting before running loop")
@@ -152,6 +197,11 @@ class StressTest(object):
             self.measure_rss()
             time.sleep(self.loop_delay)
             self.measure_rss()
+        if self.use_read_loop:
+            print("waiting before killing read loop")
+            time.sleep(self.kill_read_delay)
+            print("killing read loop")
+            p.terminate()
     
     def get_hge_rss(self):
         hge = psutil.Process(pid=self.hge_pid)
@@ -174,7 +224,7 @@ class StressTest(object):
     def visualise(self):
         figure, mem_ax = plt.subplots()
         figure.suptitle(
-            f"{self.requests_per_burst_min}(+{self.requests_per_burst_incr}) reqs + "
+            f"{self.mutations_per_burst_min}(+{self.mutations_per_burst_incr}) reqs + "
             + f"{self.request_delay}s > "
             + f"{self.bursts_per_loop_min}(+{self.bursts_per_loop_incr}) bursts + "
             + f"{self.burst_delay}s > "
@@ -307,7 +357,7 @@ if __name__ == "__main__":
     # stress_test = StressTest(
     #     hge_pid=hge_pid,
     #     bursts_per_loop=7,
-    #     requests_per_burst=8,
+    #     mutations_per_burst=8,
     #     request_delay=0.5,
     #     burst_delay=20,
     #     loop_delay=30,
