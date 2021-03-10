@@ -13,4 +13,4 @@ payload_path = "payload/light.graphql"
 read_payload_path = "payload/read.graphql"
 use_read_loop = true
 read_delay = 0.1
-kill_read_delay = 120000
+kill_read_delay = 120

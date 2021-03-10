@@ -12,3 +12,5 @@ wait_for_bursts_to_complete = false
 payload_path = "payload/heavy.graphql"
 read_payload_path = "payload/read.graphql"
 read_delay = 0.1
+use_read_loop = true
+kill_read_delay = 120
